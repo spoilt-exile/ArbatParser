@@ -48,7 +48,7 @@ public class ArbatParser {
     /**
      * Single thread executor for parsing.
      */
-    private static ExecutorService executor;
+    public static ExecutorService executor;
 
     /**
      * @param args the command line arguments
@@ -101,6 +101,16 @@ public class ArbatParser {
                         filterBuf = new StringBuffer();
                     }
                 }
+            }
+            if (header != null) {
+                FilterEntry newEntry = null;
+                if (filterBuf.length() == 0) {
+                    newEntry = new FilterEntry(header, null);
+                } else {
+                    newEntry = new FilterEntry(header, filterBuf.toString().split("\r\n"));
+                }
+                filterList.add(newEntry);
+                window.addToList(newEntry.getText());
             }
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(null, "Файлу налаштувань 'FindBik.Set' не знайдено!", "Помилка!", JOptionPane.ERROR_MESSAGE);

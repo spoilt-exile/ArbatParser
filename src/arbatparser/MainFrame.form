@@ -31,7 +31,6 @@
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
-    <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
   </SyntheticProperties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
@@ -155,11 +154,17 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x414;&#x43e;&#x434;&#x430;&#x442;&#x438;"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addButActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="editBut">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x420;&#x435;&#x434;&#x430;&#x433;&#x443;&#x432;&#x430;&#x442;&#x438;"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editButActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="delBut">
       <Properties>
@@ -171,6 +176,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x420;&#x43e;&#x437;&#x434;&#x456;&#x43b;&#x44c;&#x43d;&#x438;&#x43a;"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="splitButActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="upBut">
       <Properties>

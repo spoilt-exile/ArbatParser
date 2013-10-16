@@ -106,13 +106,28 @@ public class MainFrame extends javax.swing.JFrame {
         jScrollPane2.setViewportView(dirList);
 
         addBut.setText("Додати");
+        addBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButActionPerformed(evt);
+            }
+        });
 
         editBut.setText("Редагувати");
+        editBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editButActionPerformed(evt);
+            }
+        });
 
         delBut.setText("Видалити");
         delBut.setToolTipText("");
 
         splitBut.setText("Роздільник");
+        splitBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                splitButActionPerformed(evt);
+            }
+        });
 
         upBut.setText("▲");
 
@@ -211,18 +226,40 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void printButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButActionPerformed
-        StringBuffer mainBuf = new StringBuffer();
-        mainBuf.append(ArbatParser.getSystemHeader());
-        for (int index = 0; index < ArbatParser.filterList.size(); index++) {
-            String currPrefix = String.valueOf(index);
-            while (currPrefix.length() < 3) {
-                currPrefix = "0" + currPrefix;
+        Runnable printRunner = new Runnable() {
+
+            @Override
+            public void run() {
+                StringBuffer mainBuf = new StringBuffer();
+                mainBuf.append(ArbatParser.getSystemHeader());
+                for (int index = 0; index < ArbatParser.filterList.size(); index++) {
+                    String currPrefix = String.valueOf(index + 1);
+                    while (currPrefix.length() < 3) {
+                        currPrefix = "0" + currPrefix;
+                    }
+                    mainBuf.append(ArbatParser.filterList.get(index).getCode(currPrefix));
+                }
+                PrintView viewer = new PrintView(MainFrame.this, false, mainBuf.toString());
+                viewer.setVisible(true);
             }
-            mainBuf.append(ArbatParser.filterList.get(index).getCode(currPrefix));
-        }
-        PrintView viewer = new PrintView(this, false, mainBuf.toString());
-        viewer.setVisible(true);
+            
+        };
+        ArbatParser.executor.execute(printRunner);
     }//GEN-LAST:event_printButActionPerformed
+
+    private void addButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButActionPerformed
+        EntryEditor editor = new EntryEditor(null);
+        editor.setVisible(true);
+    }//GEN-LAST:event_addButActionPerformed
+
+    private void splitButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_splitButActionPerformed
+
+    }//GEN-LAST:event_splitButActionPerformed
+
+    private void editButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButActionPerformed
+        EntryEditor editor = new EntryEditor(ArbatParser.filterList.get(this.dirList.getSelectedIndex()));
+        editor.setVisible(true);
+    }//GEN-LAST:event_editButActionPerformed
 
     /**
      * @param args the command line arguments

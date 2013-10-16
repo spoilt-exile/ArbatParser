@@ -52,6 +52,16 @@ public class FilterEntry {
         }
         
         /**
+         * Simple constructor.
+         * @param type type of rule (D or T);
+         * @param givenFilter rule text;
+         */
+        public EntryRule(String type, String givenFilter) {
+            this.currRuleType = (type.equals("D") ? RuleTypes.DIRECTORY : RuleTypes.TEXT);
+            this.ruleFilter = givenFilter;
+        }
+        
+        /**
         * Type of filter rule.
         */
         public static enum RuleTypes {
@@ -123,7 +133,7 @@ public class FilterEntry {
     /**
      * Default flags for created entry.
      */
-    private static String defaultRuleFlags = "-nnn";
+    public static final String defaultRuleFlags = "-nnn";
     
     /**
      * Name of the entry.
@@ -169,6 +179,18 @@ public class FilterEntry {
                 }
             }
         }
+    }
+    
+    /**
+     * Simple constructor (from UI)
+     * @param givenName name of entry;
+     * @param givenFlags flags for entry;
+     * @param givenRules 
+     */
+    public FilterEntry(String givenName, String givenFlags, List<EntryRule> givenRules) {
+        this.entryName = givenName;
+        this.entryFlags = givenFlags;
+        this.ruleList = givenRules;
     }
 
     /**
@@ -261,5 +283,31 @@ public class FilterEntry {
             }
         }
         return strBuf.toString();
+    }
+    
+    /**
+     * Return new splitter dummy filter.
+     * @return preapered filter;
+     */
+    public static FilterEntry getSplitter() {
+        return new FilterEntry("XXX N -nnn   ========================", new String[] {"XXX D  ========================"});
+    }
+    
+    /**
+     * Make copy of rule list for editing.
+     * @param givenList list for making copy;
+     * @return new list with same rules;
+     */
+    public static List<EntryRule> makeCopy(List<EntryRule> givenList) {
+        List<EntryRule> copyList = new ArrayList<EntryRule>(givenList.size());
+        for (EntryRule currRule: givenList) {
+            try {
+                EntryRule copyRule = new EntryRule(currRule.getCode("XXX"));
+                copyList.add(copyRule);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        return copyList;
     }
 }
