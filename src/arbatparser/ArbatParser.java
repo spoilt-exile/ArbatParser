@@ -70,12 +70,14 @@ public class ArbatParser {
     /**
      * Parse Arbat set file in current directory.
      */
-    private static void parseSetFile() {
+    public static void parseSetFile() {
         File setFile = new File("FindBik.Set");
+        BufferedReader reader = null;
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(setFile), "Cp1251"));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(setFile), "Cp1251"));
             String header = null;
             StringBuffer filterBuf = new StringBuffer();
+            Boolean dirtyRead = false;
             while (reader.ready()) {
                 String currLine = reader.readLine();
                 if (currLine.substring(0, 3).equals("000")) {
@@ -94,6 +96,9 @@ public class ArbatParser {
                             newEntry = new FilterEntry(header, null);
                         } else {
                             newEntry = new FilterEntry(header, filterBuf.toString().split("\r\n"));
+                            if (newEntry.іsCorrupted()) {
+                                dirtyRead = true;
+                            }
                         }
                         filterList.add(newEntry);
                         window.addToList(newEntry.getText());
@@ -108,20 +113,70 @@ public class ArbatParser {
                     newEntry = new FilterEntry(header, null);
                 } else {
                     newEntry = new FilterEntry(header, filterBuf.toString().split("\r\n"));
+                    if (newEntry.іsCorrupted()) {
+                        dirtyRead = true;
+                    }
                 }
                 filterList.add(newEntry);
                 window.addToList(newEntry.getText());
             }
+            window.displayList();
+            if (dirtyRead) {
+                JOptionPane.showMessageDialog(null, "Файл прочитано з пошкодженими даними, редагування обмежене!", "Увага!", JOptionPane.WARNING_MESSAGE);
+            }
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(null, "Файлу налаштувань 'FindBik.Set' не знайдено!", "Помилка!", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Файлу налаштувань 'FindBik.Set' неможливо прочитати!", "Помилка!", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(null, "Файл налаштувань 'FindBik.Set' неможливо закрити!", "Помилка!", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Save Arbat set file with current statel
+     */
+    public static void saveSetFile() {
+        BufferedWriter writer = null;
+        Boolean dirtySave = false;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("FindBik.Set")), "Cp1251"));
+            writer.write(systemHeader);
+            for (int index = 0; index < filterList.size(); index++) {
+                String currPrefix = String.valueOf(index + 1);
+                while (currPrefix.length() < 3) {
+                    currPrefix = "0" + currPrefix;
+                }
+                if (!filterList.get(index).іsCorrupted()) {
+                    writer.write(ArbatParser.filterList.get(index).getCode(currPrefix));
+                } else {
+                    dirtySave = true;
+                }
+            }
+            if (dirtySave) {
+                JOptionPane.showMessageDialog(null, "Файл збережено з пошкодженими даними, робота файла не гарантується!", "Увага!", JOptionPane.WARNING_MESSAGE);
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Помилка запису до файлу 'FindBik.Set'!", "Помилка!", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(null, "Файл налаштувань 'FindBik.Set' неможливо закрити!", "Помилка!", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         }
     }
 
     /**
+     * Get header with system connection and interface configuration.
      * @return the systemHeader
      */
     public static String getSystemHeader() {

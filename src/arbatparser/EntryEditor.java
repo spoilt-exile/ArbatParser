@@ -31,27 +31,7 @@ public class EntryEditor extends javax.swing.JFrame {
     /**
      * Table model for rule table.
      */
-    DefaultTableModel ruleTableModel = new javax.swing.table.DefaultTableModel(
-                new Object [][] {},
-                new String [] {"Тип", "Текст"}
-            ) {
-                Class[] types = new Class [] {
-                    java.lang.String.class, java.lang.String.class
-                };
-                boolean[] canEdit = new boolean [] {
-                    false, false
-                };
-
-                @Override
-                public Class getColumnClass(int columnIndex) {
-                    return types [columnIndex];
-                }
-
-                @Override
-                public boolean isCellEditable(int rowIndex, int columnIndex) {
-                    return canEdit [columnIndex];
-                }
-            };
+    DefaultTableModel ruleTableModel;
     
     /**
      * Current selected entry.
@@ -81,18 +61,12 @@ public class EntryEditor extends javax.swing.JFrame {
             this.nameField.setText(filter.getEntryName());
             this.flagsField.setText(filter.getEntryFlags());
             this.tempList = FilterEntry.makeCopy(filter.getRuleList());
-            for (FilterEntry.EntryRule currEntry: this.tempList) {
-                String tempID = "D";
-                if (currEntry.getCurrRuleType().equals(FilterEntry.EntryRule.RuleTypes.TEXT)) {
-                    tempID = "T";
-                }
-                this.ruleTableModel.addRow(new Object[] {tempID, currEntry.getRuleFilter()});
-            }
+            this.buildRuleTable();
         }
         this.ruleTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             @Override
             public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-                if (e.getFirstIndex() != -1) {
+                if (e.getFirstIndex() != -1 && EntryEditor.this.tempList.size() > 0) {
                     EntryEditor.this.currentRule = EntryEditor.this.tempList.get(e.getFirstIndex());
                     EntryEditor.this.editBut.setEnabled(true);
                     EntryEditor.this.removeBut.setEnabled(true);
@@ -103,6 +77,9 @@ public class EntryEditor extends javax.swing.JFrame {
                 }
             }
         });
+        if (isNew || this.tempList.isEmpty()) {
+            this.autoBut.setEnabled(true);
+        }
         this.ruleTable.getColumnModel().getColumn(0).setMaxWidth(50);
     }
     
@@ -118,6 +95,41 @@ public class EntryEditor extends javax.swing.JFrame {
                 this.typeBox.setSelectedIndex(1);
             }
         }
+    }
+    
+    /**
+     * Build table with current rule list.
+     */
+    private void buildRuleTable() {
+        ruleTableModel = new javax.swing.table.DefaultTableModel(
+                        new Object [][] {},
+                        new String [] {"Тип", "Текст"}
+                    ) {
+                        Class[] types = new Class [] {
+                            java.lang.String.class, java.lang.String.class
+                        };
+                        boolean[] canEdit = new boolean [] {
+                            false, false
+                        };
+
+                        @Override
+                        public Class getColumnClass(int columnIndex) {
+                            return types [columnIndex];
+                        }
+
+                        @Override
+                        public boolean isCellEditable(int rowIndex, int columnIndex) {
+                            return canEdit [columnIndex];
+                        }
+                    };
+        for (FilterEntry.EntryRule currEntry: this.tempList) {
+            String tempID = "D";
+            if (currEntry.getCurrRuleType().equals(FilterEntry.EntryRule.RuleTypes.TEXT)) {
+                tempID = "T";
+            }
+            this.ruleTableModel.addRow(new Object[] {tempID, currEntry.getRuleFilter()});
+        }
+        this.ruleTable.setModel(ruleTableModel);
     }
 
     /**
@@ -145,6 +157,7 @@ public class EntryEditor extends javax.swing.JFrame {
         removeBut = new javax.swing.JButton();
         cancelBut = new javax.swing.JButton();
         saveBut = new javax.swing.JButton();
+        autoBut = new javax.swing.JButton();
 
         jLabel5.setText("jLabel5");
 
@@ -158,7 +171,14 @@ public class EntryEditor extends javax.swing.JFrame {
 
         jLabel2.setText("Ознаки");
 
-        ruleTable.setModel(this.ruleTableModel);
+        ruleTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
         jScrollPane1.setViewportView(ruleTable);
 
         typeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Напрямок (D)", "Текст (T)" }));
@@ -184,6 +204,11 @@ public class EntryEditor extends javax.swing.JFrame {
 
         removeBut.setText("Видалити");
         removeBut.setEnabled(false);
+        removeBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeButActionPerformed(evt);
+            }
+        });
 
         cancelBut.setText("Відмінити");
         cancelBut.addActionListener(new java.awt.event.ActionListener() {
@@ -193,6 +218,20 @@ public class EntryEditor extends javax.swing.JFrame {
         });
 
         saveBut.setText("Зберігти");
+        saveBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButActionPerformed(evt);
+            }
+        });
+
+        autoBut.setText("Авто");
+        autoBut.setToolTipText("Створити автоматичный фільтр напрямку");
+        autoBut.setEnabled(false);
+        autoBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                autoButActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -214,23 +253,27 @@ public class EntryEditor extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(typeBox, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel3))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel4)
-                                    .addComponent(ruleField, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(addBut)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(editBut)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(removeBut))))
+                                .addComponent(removeBut))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(typeBox, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel4)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(ruleField)))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addContainerGap()
+                        .addComponent(autoBut)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(saveBut)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(cancelBut)))
@@ -265,7 +308,8 @@ public class EntryEditor extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelBut)
-                    .addComponent(saveBut))
+                    .addComponent(saveBut)
+                    .addComponent(autoBut))
                 .addContainerGap())
         );
 
@@ -296,6 +340,27 @@ public class EntryEditor extends javax.swing.JFrame {
             //this.ruleTableModel.addRow(new Object[] {tempID, this.ruleField.getText()});
         }
     }//GEN-LAST:event_editButActionPerformed
+
+    private void saveButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButActionPerformed
+        FilterEntry newEntry = new FilterEntry(this.nameField.getText(), this.flagsField.getText(), this.tempList);
+        if (this.isNew) {
+            ArbatParser.window.addFilterEntry(newEntry);
+        } else {
+            ArbatParser.window.replaceFilterEntry(newEntry);
+        }
+        this.dispose();
+    }//GEN-LAST:event_saveButActionPerformed
+
+    private void autoButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoButActionPerformed
+        this.tempList.add(new FilterEntry.EntryRule("D", this.nameField.getText()));
+        this.ruleTableModel.addRow(new Object[] {"D", this.nameField.getText()});
+    }//GEN-LAST:event_autoButActionPerformed
+
+    private void removeButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButActionPerformed
+        int currPos = this.ruleTable.getSelectedRow();
+        this.tempList.remove(currPos);
+        this.buildRuleTable();
+    }//GEN-LAST:event_removeButActionPerformed
 
     /**
      * @param args the command line arguments
@@ -340,6 +405,7 @@ public class EntryEditor extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addBut;
+    private javax.swing.JButton autoBut;
     private javax.swing.JButton cancelBut;
     private javax.swing.JButton editBut;
     private javax.swing.JTextField flagsField;

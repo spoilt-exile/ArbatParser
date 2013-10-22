@@ -20,6 +20,7 @@
 package arbatparser;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 
 /**
  * Main window class.
@@ -44,8 +45,17 @@ public class MainFrame extends javax.swing.JFrame {
      * @param name name of entry;
      */
     public void addToList(String name) {
+        //System.out.println("Додоано: " + name);
         this.dirListModel.addElement(name);
     }
+    
+    /**
+     * Link dir list to it's model (bug fix);
+     */
+    public void displayList() {
+        this.dirList.setModel(dirListModel);
+    }
+            
     
     /**
      * Reset dir list.
@@ -63,7 +73,29 @@ public class MainFrame extends javax.swing.JFrame {
         for (String currName: names) {
             this.dirListModel.addElement(currName);
         }
-    } 
+    }
+    
+    /**
+     * Add new entry to dir list.
+     * @param givenEntry new created filter entry;
+     */
+    public void addFilterEntry(FilterEntry givenEntry) {
+        int currPos = this.dirList.getSelectedIndex();
+        this.dirListModel.add(currPos + 1, givenEntry.getEntryName());
+        ArbatParser.filterList.add(currPos + 1, givenEntry);
+    }
+    
+    /**
+     * Replace old entry by new edition.
+     * @param givenEntry newer entry;
+     */
+    public void replaceFilterEntry(FilterEntry givenEntry) {
+        int currPos = this.dirList.getSelectedIndex();
+        this.dirListModel.remove(currPos);
+        ArbatParser.filterList.remove(currPos);
+        this.dirListModel.add(currPos, givenEntry.getEntryName());
+        ArbatParser.filterList.add(currPos, givenEntry);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -90,6 +122,7 @@ public class MainFrame extends javax.swing.JFrame {
         cancelBut = new javax.swing.JButton();
         saveBut = new javax.swing.JButton();
         printBut = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         jList1.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -101,8 +134,12 @@ public class MainFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Налаштування напрямків");
 
-        dirList.setModel(this.dirListModel);
         dirList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        dirList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                dirListValueChanged(evt);
+            }
+        });
         jScrollPane2.setViewportView(dirList);
 
         addBut.setText("Додати");
@@ -113,6 +150,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         editBut.setText("Редагувати");
+        editBut.setEnabled(false);
         editBut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editButActionPerformed(evt);
@@ -121,6 +159,12 @@ public class MainFrame extends javax.swing.JFrame {
 
         delBut.setText("Видалити");
         delBut.setToolTipText("");
+        delBut.setEnabled(false);
+        delBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                delButActionPerformed(evt);
+            }
+        });
 
         splitBut.setText("Роздільник");
         splitBut.addActionListener(new java.awt.event.ActionListener() {
@@ -130,21 +174,64 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         upBut.setText("▲");
+        upBut.setToolTipText("Пересунути на одну позицію догори");
+        upBut.setEnabled(false);
+        upBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                upButActionPerformed(evt);
+            }
+        });
 
         downBut.setText("▼");
+        downBut.setToolTipText("Пересунути на одну позиції донизу");
+        downBut.setEnabled(false);
+        downBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                downButActionPerformed(evt);
+            }
+        });
 
         topBut.setText("↑");
+        topBut.setToolTipText("Пересунути нагору");
+        topBut.setEnabled(false);
+        topBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                topButActionPerformed(evt);
+            }
+        });
 
         lowBut.setText("↓");
+        lowBut.setToolTipText("Пересунути донизу");
+        lowBut.setEnabled(false);
+        lowBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lowButActionPerformed(evt);
+            }
+        });
 
         exitBut.setText("Вийти");
+        exitBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitButActionPerformed(evt);
+            }
+        });
 
         cancelBut.setForeground(new java.awt.Color(51, 153, 0));
         cancelBut.setText("Відкинути зміни");
+        cancelBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButActionPerformed(evt);
+            }
+        });
 
         saveBut.setForeground(new java.awt.Color(153, 0, 0));
         saveBut.setText("Зберігти зміни");
         saveBut.setToolTipText("");
+        saveBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButActionPerformed(evt);
+            }
+        });
 
         printBut.setText("Переглянути код");
         printBut.addActionListener(new java.awt.event.ActionListener() {
@@ -153,6 +240,8 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        jButton1.setText("?");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -160,36 +249,35 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(saveBut)
-                                .addGap(18, 18, 18)
-                                .addComponent(cancelBut)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 119, Short.MAX_VALUE)
-                                .addComponent(printBut)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(saveBut)
+                        .addGap(18, 18, 18)
+                        .addComponent(cancelBut)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 119, Short.MAX_VALUE)
+                        .addComponent(printBut)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(exitBut))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(upBut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(downBut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(exitBut))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                            .addComponent(upBut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(downBut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(topBut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(lowBut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(delBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(addBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(splitBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(editBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
-                        .addContainerGap())
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(topBut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lowBut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(delBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(addBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(splitBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(editBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane2)
-                        .addGap(141, 141, 141))))
+                        .addGap(92, 92, 92)
+                        .addComponent(jButton1)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -211,7 +299,9 @@ public class MainFrame extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(downBut)
-                            .addComponent(lowBut)))
+                            .addComponent(lowBut))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE))
                 .addGap(15, 15, 15)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -253,13 +343,122 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_addButActionPerformed
 
     private void splitButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_splitButActionPerformed
-
+        this.addFilterEntry(FilterEntry.getSplitter());
     }//GEN-LAST:event_splitButActionPerformed
 
     private void editButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButActionPerformed
         EntryEditor editor = new EntryEditor(ArbatParser.filterList.get(this.dirList.getSelectedIndex()));
         editor.setVisible(true);
     }//GEN-LAST:event_editButActionPerformed
+
+    private void cancelButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButActionPerformed
+        ArbatParser.filterList = new java.util.ArrayList<FilterEntry>();
+        this.resetList();
+        Runnable parseRunner = new Runnable() {
+
+            @Override
+            public void run() {
+                ArbatParser.parseSetFile();
+            }
+            
+        };
+        ArbatParser.executor.execute(parseRunner);
+    }//GEN-LAST:event_cancelButActionPerformed
+
+    private void delButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delButActionPerformed
+        int currPos = this.dirList.getSelectedIndex();
+        this.dirListModel.remove(currPos);
+        ArbatParser.filterList.remove(currPos);
+        if (ArbatParser.filterList.size() - 1 > currPos) {
+            this.dirList.setSelectedIndex(currPos);
+        } else {
+            this.dirList.setSelectedIndex(currPos - 1);
+        }
+    }//GEN-LAST:event_delButActionPerformed
+
+    private void dirListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_dirListValueChanged
+        if (this.dirList.getSelectedIndex() != -1) {
+            this.editBut.setEnabled(true);
+            this.delBut.setEnabled(true);
+            this.upBut.setEnabled(true);
+            this.downBut.setEnabled(true);
+            this.topBut.setEnabled(true);
+            this.lowBut.setEnabled(true);
+        } else {
+            this.editBut.setEnabled(false);
+            this.delBut.setEnabled(false);
+            this.upBut.setEnabled(false);
+            this.downBut.setEnabled(false);
+            this.topBut.setEnabled(false);
+            this.lowBut.setEnabled(false);
+        }
+    }//GEN-LAST:event_dirListValueChanged
+
+    private void upButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButActionPerformed
+        int currPos = this.dirList.getSelectedIndex();
+        if (currPos > 0) {
+            this.dirListModel.remove(currPos);
+            FilterEntry moved = ArbatParser.filterList.remove(currPos);
+            this.dirListModel.add(currPos - 1 , moved.getEntryName());
+            ArbatParser.filterList.add(currPos - 1, moved);
+            this.dirList.setSelectedIndex(currPos - 1);
+            this.dirList.ensureIndexIsVisible(currPos - 1);
+        }
+    }//GEN-LAST:event_upButActionPerformed
+
+    private void downButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downButActionPerformed
+        int currPos = this.dirList.getSelectedIndex();
+        if (currPos < ArbatParser.filterList.size() - 1) {
+            this.dirListModel.remove(currPos);
+            FilterEntry moved = ArbatParser.filterList.remove(currPos);
+            this.dirListModel.add(currPos + 1, moved.getEntryName());
+            ArbatParser.filterList.add(currPos + 1, moved);
+            this.dirList.setSelectedIndex(currPos + 1);
+            this.dirList.ensureIndexIsVisible(currPos + 1);
+        }
+    }//GEN-LAST:event_downButActionPerformed
+
+    private void topButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_topButActionPerformed
+        int currPos = this.dirList.getSelectedIndex();
+        if (currPos > 0) {
+            this.dirListModel.remove(currPos);
+            FilterEntry moved = ArbatParser.filterList.remove(currPos);
+            this.dirListModel.add(0 , moved.getEntryName());
+            ArbatParser.filterList.add(0, moved);
+            this.dirList.setSelectedIndex(0);
+            this.dirList.ensureIndexIsVisible(0);
+        }
+    }//GEN-LAST:event_topButActionPerformed
+
+    private void lowButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lowButActionPerformed
+        int currPos = this.dirList.getSelectedIndex();
+        if (currPos < ArbatParser.filterList.size() - 1) {
+            this.dirListModel.remove(currPos);
+            FilterEntry moved = ArbatParser.filterList.remove(currPos);
+            int low = ArbatParser.filterList.size();
+            this.dirListModel.add(low, moved.getEntryName());
+            ArbatParser.filterList.add(low, moved);
+            this.dirList.setSelectedIndex(low);
+            this.dirList.ensureIndexIsVisible(low);
+        }
+    }//GEN-LAST:event_lowButActionPerformed
+
+    private void saveButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButActionPerformed
+        Runnable saveRunner = new Runnable() {
+
+            @Override
+            public void run() {
+                ArbatParser.saveSetFile();
+                JOptionPane.showMessageDialog(null, "Файл налаштуваннь вдало сбережено.", "Увага", JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+        };
+        ArbatParser.executor.execute(saveRunner);
+    }//GEN-LAST:event_saveButActionPerformed
+
+    private void exitButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_exitButActionPerformed
 
     /**
      * @param args the command line arguments
@@ -310,6 +509,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton downBut;
     private javax.swing.JButton editBut;
     private javax.swing.JButton exitBut;
+    private javax.swing.JButton jButton1;
     private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
