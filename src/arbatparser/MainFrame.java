@@ -241,6 +241,11 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         jButton1.setText("?");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -385,7 +390,9 @@ public class MainFrame extends javax.swing.JFrame {
             this.topBut.setEnabled(true);
             this.lowBut.setEnabled(true);
         } else {
-            this.editBut.setEnabled(false);
+            if (!ArbatParser.filterList.get(this.dirList.getSelectedIndex()).іsCorrupted()) {
+                this.editBut.setEnabled(false); //Prevent to edit corrupted entries. Deleting only.
+            }
             this.delBut.setEnabled(false);
             this.upBut.setEnabled(false);
             this.downBut.setEnabled(false);
@@ -459,6 +466,10 @@ public class MainFrame extends javax.swing.JFrame {
     private void exitButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButActionPerformed
         System.exit(0);
     }//GEN-LAST:event_exitButActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        JOptionPane.showMessageDialog(null, "ArbatParser v0.1 (22-10-2013)\n\nСирцевий код утиліти росповсюджується на умовах ліцензії GNU GPLv2 (або більш нової редакції).\n\nАвтор: Непочатов Станіслав © 2013", "О ArbatParser", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
