@@ -19,6 +19,9 @@
 
 package arbatparser;
 
+import arbatparser.FilterEntry.EntryRule;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
@@ -122,7 +125,9 @@ public class MainFrame extends javax.swing.JFrame {
         cancelBut = new javax.swing.JButton();
         saveBut = new javax.swing.JButton();
         printBut = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        helpBut = new javax.swing.JButton();
+        quickDirField = new javax.swing.JTextField();
+        quckDirBut = new javax.swing.JButton();
 
         jList1.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -240,10 +245,23 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("?");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        helpBut.setText("?");
+        helpBut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                helpButActionPerformed(evt);
+            }
+        });
+
+        quickDirField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                quickDirFieldKeyPressed(evt);
+            }
+        });
+
+        quckDirBut.setText("Напрямок +");
+        quckDirBut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                quckDirButActionPerformed(evt);
             }
         });
 
@@ -258,12 +276,19 @@ public class MainFrame extends javax.swing.JFrame {
                         .addComponent(saveBut)
                         .addGap(18, 18, 18)
                         .addComponent(cancelBut)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 119, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(printBut)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(exitBut))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(quckDirBut)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(quickDirField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -277,21 +302,21 @@ public class MainFrame extends javax.swing.JFrame {
                                 .addComponent(delBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(addBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(splitBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(editBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2)
-                        .addGap(92, 92, 92)
-                        .addComponent(jButton1)))
+                                .addComponent(editBut, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(helpBut, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(addBut)
+                    .addComponent(quickDirField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(quckDirBut))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(addBut)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(splitBut)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(editBut)
@@ -305,9 +330,9 @@ public class MainFrame extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(downBut)
                             .addComponent(lowBut))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 126, Short.MAX_VALUE)
+                        .addComponent(helpBut))
+                    .addComponent(jScrollPane2))
                 .addGap(15, 15, 15)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exitBut)
@@ -383,16 +408,17 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void dirListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_dirListValueChanged
         if (this.dirList.getSelectedIndex() != -1) {
-            this.editBut.setEnabled(true);
             this.delBut.setEnabled(true);
+            if (ArbatParser.filterList.get(this.dirList.getSelectedIndex()).іsCorrupted()) {
+                this.editBut.setEnabled(false); //Prevent to edit corrupted entries. Deleting only.
+            } else {
+                this.editBut.setEnabled(true);
+            }
             this.upBut.setEnabled(true);
             this.downBut.setEnabled(true);
             this.topBut.setEnabled(true);
             this.lowBut.setEnabled(true);
         } else {
-            if (!ArbatParser.filterList.get(this.dirList.getSelectedIndex()).іsCorrupted()) {
-                this.editBut.setEnabled(false); //Prevent to edit corrupted entries. Deleting only.
-            }
             this.delBut.setEnabled(false);
             this.upBut.setEnabled(false);
             this.downBut.setEnabled(false);
@@ -467,9 +493,28 @@ public class MainFrame extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_exitButActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        JOptionPane.showMessageDialog(null, "ArbatParser v0.1 (22-10-2013)\n\nСирцевий код утиліти росповсюджується на умовах ліцензії GNU GPLv2 (або більш нової редакції).\n\nАвтор: Непочатов Станіслав © 2013", "О ArbatParser", JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void helpButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpButActionPerformed
+        JOptionPane.showMessageDialog(null, "ArbatParser v0.2 (26-05-2014)\n\nСирцевий код утиліти росповсюджується на умовах ліцензії GNU GPLv2 (або більш нової редакції).\n\nАвтор: Непочатов Станіслав © 2013-2014", "О ArbatParser", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_helpButActionPerformed
+
+    private void quickDirFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_quickDirFieldKeyPressed
+        if(quickDirField.getText().length()>=4)
+        {
+            quickDirField.setText(quickDirField.getText().substring(0, 3));
+        }
+    }//GEN-LAST:event_quickDirFieldKeyPressed
+
+    private void quckDirButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quckDirButActionPerformed
+        if (!this.quickDirField.getText().isEmpty()) {
+            List<EntryRule> newList = new ArrayList<EntryRule>(1);
+            newList.add(new EntryRule("D", this.quickDirField.getText()));
+            FilterEntry newEntry = new FilterEntry(this.quickDirField.getText(), FilterEntry.defaultRuleFlags, newList);
+            this.quickDirField.setText("");
+            this.addFilterEntry(newEntry);
+        } else {
+            JOptionPane.showMessageDialog(null, "Введіть назву напрямку!", "Увага!", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_quckDirButActionPerformed
 
     /**
      * @param args the command line arguments
@@ -520,12 +565,14 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton downBut;
     private javax.swing.JButton editBut;
     private javax.swing.JButton exitBut;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton helpBut;
     private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton lowBut;
     private javax.swing.JButton printBut;
+    private javax.swing.JButton quckDirBut;
+    private javax.swing.JTextField quickDirField;
     private javax.swing.JButton saveBut;
     private javax.swing.JButton splitBut;
     private javax.swing.JButton topBut;

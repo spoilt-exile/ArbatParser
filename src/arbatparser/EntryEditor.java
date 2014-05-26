@@ -41,7 +41,7 @@ public class EntryEditor extends javax.swing.JFrame {
     /**
      * Temp list of rules for new entries.
      */
-    private List<FilterEntry.EntryRule> tempList;
+    private List<FilterEntry.EntryRule> tempList = new ArrayList();
     
     /**
      * Flag which display is entry is new or edit mode.
@@ -61,18 +61,19 @@ public class EntryEditor extends javax.swing.JFrame {
             this.nameField.setText(filter.getEntryName());
             this.flagsField.setText(filter.getEntryFlags());
             this.tempList = FilterEntry.makeCopy(filter.getRuleList());
-            this.buildRuleTable();
         }
+        this.buildRuleTable();
         this.ruleTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             @Override
             public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-                if (e.getFirstIndex() != -1 && EntryEditor.this.tempList.size() > 0) {
+                if (e.getFirstIndex() != -1 && e.getFirstIndex() < EntryEditor.this.tempList.size() && EntryEditor.this.tempList.size() > 0) {
                     EntryEditor.this.currentRule = EntryEditor.this.tempList.get(e.getFirstIndex());
                     EntryEditor.this.editBut.setEnabled(true);
                     EntryEditor.this.removeBut.setEnabled(true);
                     EntryEditor.this.refreshRule();
                 } else {
-                    EntryEditor.this.editBut.setEnabled(true);
+                    EntryEditor.this.currentRule = null;
+                    EntryEditor.this.editBut.setEnabled(false);
                     EntryEditor.this.removeBut.setEnabled(false);
                 }
             }
